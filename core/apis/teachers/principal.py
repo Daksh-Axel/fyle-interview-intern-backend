@@ -10,7 +10,7 @@ principal_teacher_resources = Blueprint('principal_teacher_resources', __name__)
 
 @principal_teacher_resources.route('/teachers', methods=['GET'], strict_slashes=False)
 @decorators.authenticate_principal
-def list_assignments(p):
+def list_teachers(p):
     """Returns list of teachers"""
     principal_teachers = Teacher.get_teacher_list()
     principal_teachers_dump = TeacherSchema().dump(principal_teachers, many=True)

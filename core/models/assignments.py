@@ -5,7 +5,9 @@ from core.libs import helpers, assertions
 from core.models.teachers import Teacher
 from core.models.students import Student
 from sqlalchemy.types import Enum as BaseEnum
-from sqlalchemy import or_
+from sqlalchemy import or_,and_
+
+
 
 class GradeEnum(str, enum.Enum):
     A = 'A'
@@ -54,6 +56,7 @@ class Assignment(db.Model):
             assignment.content = assignment_new.content
         else:
             assignment = assignment_new
+            assertions.assert_valid(assignment.content is not None,"Content cannot be None!")
             db.session.add(assignment_new)
 
         db.session.flush()
@@ -77,8 +80,8 @@ class Assignment(db.Model):
     def mark_grade(cls, _id, grade, auth_principal: AuthPrincipal):
         assignment = Assignment.get_by_id(_id)
         assertions.assert_found(assignment, 'No assignment with this id was found')
-        assertions.assert_valid(grade is not None, 'assignment with empty grade cannot be graded')
-
+        assertions.assert_valid(assignment.state != AssignmentStateEnum.DRAFT,'Drafted assignment cannot be graded')
+        assertions.assert_valid(assignment.teacher_id == auth_principal.teacher_id or auth_principal.principal_id is not None,'Assingment to be graded by the teacher to whom submitted!')
         assignment.grade = grade
         assignment.state = AssignmentStateEnum.GRADED
         db.session.flush()
@@ -90,8 +93,8 @@ class Assignment(db.Model):
         return cls.filter(cls.student_id == student_id).all()
 
     @classmethod
-    def get_assignments_by_teacher(cls):
-        return cls.query.all()
+    def get_assignments_by_teacher(cls,auth_principal: AuthPrincipal):
+        return cls.filter(and_(cls.state == "SUBMITTED", cls.teacher_id == auth_principal.teacher_id)).all()
     
     @classmethod
     # returning assignmnets with the state either SUBMITTED or GRADED

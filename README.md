@@ -10,7 +10,7 @@ The application is dockerized. Follow the given instruction to run application i
 ### Running in Docker
 Requirement: Install `docker-compose` (if not avialable).
 1. After cloning, open the terminal inside the root directory of the project.
-2. 
+2. Run the following commands one by one:
 ```
 docker-compose build
 docker-compose up
@@ -53,6 +53,7 @@ pytest -vvv -s tests/
 # pytest --cov
 # open htmlcov/index.html
 ```
+Run `./test_coverage.sh` to see the tests, result and its covearge report
 
 
 ## Who is this for?

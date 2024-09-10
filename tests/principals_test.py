@@ -102,3 +102,22 @@ def test_get_teacher_list(client, h_principal):
     assert expected_result == actual_result
 
 
+def test_get_teacher_list_without_authenticated_principal(client):
+    '''Unauthorized access to route'''
+    response = client.get(
+        '/principal/teachers'
+    )
+    assert response.status_code == 401
+
+
+def test_grade_assignmment_by_student(client,h_student_1):
+    '''A student tries to grade an assignment'''
+    response = client.post(
+        '/principal/assignments/grade',
+        json={
+            'id': 4,
+            'grade': GradeEnum.A.value
+        },
+        headers=h_student_1
+    )
+    assert response.status_code == 403
